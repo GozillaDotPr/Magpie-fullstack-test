@@ -21,6 +21,7 @@
     "paths": {
       "@/*": ["./*"],
       "@database/*": ["./database/*"],
+      "@helper/*":["./helper/*"],
     }
   },
   "include": [
