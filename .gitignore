@@ -27,3 +27,4 @@ prisma/*.db
 
 # misc
 *.pem
+/app/generated/prisma
