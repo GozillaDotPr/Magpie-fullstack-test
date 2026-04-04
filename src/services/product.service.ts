@@ -1,8 +1,9 @@
 import db from "@database/prisma";
 
-import {ProductType,ProductSchema} from "@/schemas/product"
+import {ProductSchema} from "@/schemas/product"
 import { getDataApi } from "@/helper/utils";
-import { error } from "console";
+
+import { productRepo } from "@/src/repository/product.repo";
 
 const url = process.env.EXTERNAL_API_BASE_URL + "/api/products";
 
@@ -19,38 +20,27 @@ function validateProduct(product: any) {
   }
 }
 
-async function validateProducts(products: any[]) {
+async function validateProductsAndSave(products: any[]) {
   for (const product of products) {
+    // clean or error
     validateProduct(product);
-    await createDataProduct(product)
+    var productID = parseInt(product.product_id);
+    var existsProduct = await productRepo.checkProductExists(productID);
+
+    if (existsProduct) {
+      await productRepo.updateDataProduct(product);
+    }else{
+      await productRepo.createDataProduct(product);
+    }
+
   }
 }
 
-async function createDataProduct(data:any){
-    return  db.product.create({
-      data: {
-        product_external_id: data.product_id,
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        unit: data.unit,
-        image: data.image,
-        discount: data.discount,
-        availability: data.availability,
-        brand: data.brand,
-        rating: data.rating,
-
-        created_at: new Date(), 
-        updated_at: new Date(),
-      },
-    });
-}
 
 async function saveProductsToDatabase() {
   const products = await getDataFromExternalAPI();
   try{
-    await validateProducts(products);
-
+    await validateProductsAndSave(products);
   }catch(err){
     console.log(err)
   }

@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+const ReviewSchema = z.object({
+  user_id: z.number().int(),
+  rating: z.number().min(1).max(5),
+  comment: z.string().min(1, "Comment cannot be empty"),
+});
+
 export const ProductSchema = z.object({
   id: z.number().int().optional(),
   product_id: z.number()
@@ -18,7 +24,7 @@ export const ProductSchema = z.object({
     .min(0, { message: "Rating cannot be negative" })
     .max(5, { message: "Rating cannot exceed 5" }),
 
-  product_reviews: z.array(z.any()).optional(),
+  reviews: z.array(ReviewSchema).optional(),
 });
 
 export type ProductType = z.infer<typeof ProductSchema>;
