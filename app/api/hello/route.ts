@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 
-import db from "@database/prisma";
+import { productService } from "@/src/services/product.service";
+
+
 
 export async function GET() {
   console.log(process.env.DATABASE_URL);
-  const orders = await db.order.findMany();
-  return Response.json({ ok: process.env.DATABASE_URL, orders });
+  const a = await productService.saveProductsToDatabase();
+  return Response.json({ ok: process.env.DATABASE_URL });
 }

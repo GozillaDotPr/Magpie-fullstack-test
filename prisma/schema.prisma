@@ -43,17 +43,16 @@ model Product {
   name String
   description String
   price Float
-  Unit String
-  Image String
+  unit String
+  image String
   discount Int
-  availbility Boolean
+  availability Boolean
   brand String
   rating Float
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
   product_reviews     Product_review[]
-
 
   @@map("products")
 }
