@@ -21,18 +21,8 @@ async function upsertOrder(data: OrderType) {
                 },
         },
         update:{
-            order_external_id : data.order_id,
-            user_id : data.user_id,
-            total_price: data.total_price,
             status : data.status,
             updated_at: new Date(),
-            order_details:{
-                deleteMany:{},
-                create: data.items ? data.items.map((item: any) => ({
-                        product_id: item.product_id,
-                        quantity: item.quantity,
-                    })) : [],
-            }
         }
         
     });
