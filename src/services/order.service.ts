@@ -1,33 +1,32 @@
-
-import {ProductSchema} from "@/schemas/product"
 import { getDataApi } from "@/helper/utils";
+import { OrderSchema } from "@/schemas/order";
 
-import { productRepo } from "@/src/repository/product.repo";
+import {orderRepo} from "@/src/repository/order.repo"
 import { triggerLogRepo } from "@/src/repository/trigger.log.repo";
 
-
-const url = process.env.EXTERNAL_API_BASE_URL + "/api/products";
-
+const url = process.env.EXTERNAL_API_BASE_URL + "/api/orders";
 
 async function getDataFromExternalAPI() {
   return await getDataApi(url);
 }
 
-function validateProduct(product: any) {
-  const validate = ProductSchema.safeParse(product);
+function validateOrder(order: any) {
+  const validate = OrderSchema.safeParse(order);
   if (!validate.success){
     const errorMessages = JSON.stringify(validate.error.flatten().fieldErrors);
     throw new Error(errorMessages);
   }
 }
 
-async function validateProductsAndSave(products: any[]) {
+
+
+async function validateOrderAndSave(orders: any[]) {
   var summary = {error:0,success:0}
 
-  for (const product of products) {
+  for (const order of orders) {
     try{
-      validateProduct(product);
-      await productRepo.upsertProduct(product);
+      validateOrder(order);
+      await orderRepo.UpsertOrder(order);
       summary.success++;
     }catch(err:any){
       summary.error++
@@ -37,12 +36,11 @@ async function validateProductsAndSave(products: any[]) {
   return summary
 }
 
-
-async function saveProductsToDatabase() {
-  const products = await getDataFromExternalAPI();
-  const processSummary = await validateProductsAndSave(products);
+async function saveOrdersToDatabase() {
+  const orders = await getDataFromExternalAPI();
+  const processSummary = await validateOrderAndSave(orders);
   const trigger_log = {
-    type:"product_log",
+    type:"order_log",
     success: processSummary.success,
     error : processSummary.error,
   } 
@@ -54,7 +52,6 @@ async function saveProductsToDatabase() {
   }
 }
 
-
-export const productService = {
-  saveProductsToDatabase,
-};
+export const orderService = {
+    saveOrdersToDatabase
+}

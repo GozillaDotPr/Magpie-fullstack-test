@@ -99,6 +99,14 @@ async function upsertProduct(data:any){
         brand: data.brand,
         rating: data.rating,
         updated_at: new Date(),
+        product_reviews: {
+          deleteMany : {},
+          create: data.reviews ? data.reviews.map((rev: any) => ({
+          user_id: rev.user_id,
+          rating: rev.rating,
+          comment: rev.comment,
+        })) : [],
+        },
       },
   });
 }

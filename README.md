@@ -7,6 +7,8 @@ After fetching data from the API, I perform an upsert for the product data to en
 For product reviews, I use a delete-all-and-insert-from-scratch approach. I chose this method to avoid duplication and maintain database efficiency for the products table.
 
 I opted for this approach for reviews because the current number of reviews is still relatively small. Once the dataset grows to thousands of entries, we can scale and implement a more optimized algorithm to handle the data.
+
+
 First, run the development server:
 
 ```bash
