@@ -70,7 +70,7 @@ model Product_review{
   comment String
   product_id Int
 
-  product_relation Product @relation(fields: [product_id], references: [id])
+  product_relation Product @relation(fields: [product_id], references: [product_external_id])
   @@map("product_reviews")
 }
 
