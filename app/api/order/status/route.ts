@@ -8,7 +8,7 @@ export async function GET() {
     _all: true,
   },
 });
-  const formattedForChart = groupedOrders.map((item) => ({
+  const formattedForChart = groupedOrders.map((item:any) => ({
     name: item.status,          
     value: item._count._all,
   }));

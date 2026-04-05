@@ -11,7 +11,7 @@ export async function GET() {
         },
     });
 
-    const chartData = groupedProducts.map((item) => ({
+    const chartData = groupedProducts.map((item:any) => ({
         name: item.category,
         count: item._count._all,
     }));
