@@ -16,16 +16,17 @@ function validateOrder(order: any) {
     const errorMessages = JSON.stringify(validate.error.flatten().fieldErrors);
     throw new Error(errorMessages);
   }
+  return validate.data
 }
 
 
 async function validateOrderAndSave(orders: any[]) {
-  var summary = {error:0,success:0}
+  let summary = {error:0,success:0}
 
   for (const order of orders) {
     try{
-      validateOrder(order);
-      await orderRepo.UpsertOrder(order);
+      const validatedOrder = validateOrder(order);
+      await orderRepo.upsertOrder(validatedOrder);
       summary.success++;
     }catch(err:any){
       summary.error++
@@ -44,11 +45,9 @@ async function saveOrdersToDatabase() {
     error : processSummary.error,
   } 
 
-  try{
-    await triggerLogRepo.createDataTriggerLog(trigger_log)
-  }catch{
-    console.error("Error creating trigger log")
-  }
+  await triggerLogRepo.createDataTriggerLog(trigger_log)
+
+  return processSummary
 }
 
 export const orderService = {

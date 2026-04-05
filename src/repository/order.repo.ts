@@ -1,9 +1,10 @@
 import db from "@database/prisma";
+import { OrderType } from "@/schemas/order";
 
-async function UpsertOrder(data:any){
-    const orderid = data.order_id
+async function upsertOrder(data: OrderType) {
+    const orderid = data.order_id;
 
-    await db.order.upsert({
+    return await db.order.upsert({
         where: { order_external_id: orderid },
         create : {
             order_external_id : data.order_id,
@@ -38,5 +39,5 @@ async function UpsertOrder(data:any){
 }
 
 export const orderRepo = {
-    UpsertOrder
+    upsertOrder
 }

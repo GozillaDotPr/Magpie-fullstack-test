@@ -17,8 +17,7 @@ export const OrderSchema = z.object({
     total_price: z.number()
     .min(0, { message: "Price cannot be negative" }),
     status: z.string().nonempty({ message: "Status is required" }),
-
-    reviews: z.array(ItemSchema).optional(),
+    items: z.array(ItemSchema),
 });
 
 export type OrderType = z.infer<typeof OrderSchema>;

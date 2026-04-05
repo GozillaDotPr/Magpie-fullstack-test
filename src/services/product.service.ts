@@ -19,15 +19,17 @@ function validateProduct(product: any) {
     const errorMessages = JSON.stringify(validate.error.flatten().fieldErrors);
     throw new Error(errorMessages);
   }
+  return validate.data
+
 }
 
 async function validateProductsAndSave(products: any[]) {
-  var summary = {error:0,success:0}
+  let summary = {error:0,success:0}
 
   for (const product of products) {
     try{
-      validateProduct(product);
-      await productRepo.upsertProduct(product);
+      const validatedProduct = validateProduct(product);
+      await productRepo.upsertProduct(validatedProduct);
       summary.success++;
     }catch(err:any){
       summary.error++
@@ -47,11 +49,9 @@ async function saveProductsToDatabase() {
     error : processSummary.error,
   } 
 
-  try{
-    await triggerLogRepo.createDataTriggerLog(trigger_log)
-  }catch{
-    console.error("Error creating trigger log")
-  }
+  
+  await triggerLogRepo.createDataTriggerLog(trigger_log)
+  return processSummary
 }
 
 

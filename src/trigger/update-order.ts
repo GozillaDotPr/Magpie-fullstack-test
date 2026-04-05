@@ -1,23 +1,36 @@
-import { logger, schedules, wait } from "@trigger.dev/sdk/v3";
-
-import {orderService} from "../services/order.service"
+import { logger, schedules } from "@trigger.dev/sdk/v3";
+import { orderService } from "../services/order.service"
 
 
 export const updateOrder = schedules.task({
     id: "update-order",
-    cron: "*/1 * * * *",
-    maxDuration: 300, 
+    cron: "* */1 * * *",
+    retry: {
+        maxAttempts: 3,
+        factor: 2,
+        minTimeoutInMs: 1000 * 60,
+        maxTimeoutInMs: 1000 * 60 * 10,
+    },
+    maxDuration: 300,
     run: async (payload, { ctx }) => {
-        logger.log("Updating order", { payload });
+        logger.log("Starting product update sync", { payload });
 
         try {
-            const a = await orderService.saveOrdersToDatabase();
-        } catch (err: any) {
-            logger.error("Failed to save orders:", err.message);
+            const result = await orderService.saveOrdersToDatabase();
+
+            if (result.error > 0) {
+                logger.warn(`${result.error} records failed validation or saving`, { result });
+            } else {
+                logger.log("All orders updated successfully", { result });
+            }
+
+        } catch (error: any) {
+            logger.error("CRITICAL: Failed to update orders", {
+                error: error.message,
+                stack: error.stack
+            });
+
+            throw error;
         }
-
-        await wait.for({ seconds: 5 });
-
-        logger.log("Order updated");
     }
 });
