@@ -15,7 +15,7 @@ export const updateOrder = schedules.task({
     run: async (payload, { ctx }) => {
         logger.log("Starting product update sync", { payload });
         // reduce change race condition with product
-        await wait.for({ seconds: 30 });
+        // await wait.for({ seconds: 30 });
 
         try {
             const result = await orderService.saveOrdersToDatabase();

@@ -15,7 +15,7 @@ const formatter = new Intl.NumberFormat('en-US', {
 });
 
 const formattedRecentOrders = recentOrdersData.map((order) => ({
-  id: order.id, 
+  id: order.order_external_id, 
   date: new Intl.DateTimeFormat('en-US', { 
     month: 'short', 
     day: 'numeric', 

@@ -4,6 +4,8 @@ import { OrderSchema } from "@/schemas/order";
 import {orderRepo} from "@/src/repository/order.repo"
 import { triggerLogRepo } from "@/src/repository/trigger.log.repo";
 
+import {orderVariant} from "@/src/variant/order.varian"
+
 const url = process.env.EXTERNAL_API_BASE_URL + "/api/orders";
 
 async function getDataFromExternalAPI() {
@@ -38,7 +40,8 @@ async function validateOrderAndSave(orders: any[]) {
 
 async function saveOrdersToDatabase() {
   const orders = await getDataFromExternalAPI();
-  const processSummary = await validateOrderAndSave(orders);
+  const order_with_variants = await orderVariant.addVariant(orders);
+  const processSummary = await validateOrderAndSave(order_with_variants);
   const trigger_log = {
     type:"order_log",
     success: processSummary.success,

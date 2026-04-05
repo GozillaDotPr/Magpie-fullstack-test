@@ -5,6 +5,8 @@ import { getDataApi } from "@/helper/utils";
 import { productRepo } from "@/src/repository/product.repo";
 import { triggerLogRepo } from "@/src/repository/trigger.log.repo";
 
+import {productVariant} from "@/src/variant/product.variant"
+
 
 const url = process.env.EXTERNAL_API_BASE_URL + "/api/products";
 
@@ -42,7 +44,10 @@ async function validateProductsAndSave(products: any[]) {
 
 async function saveProductsToDatabase() {
   const products = await getDataFromExternalAPI();
-  const processSummary = await validateProductsAndSave(products);
+
+  const productVariants = await productVariant.addVariant(products);
+
+  const processSummary = await validateProductsAndSave(productVariants);
   const trigger_log = {
     type:"product_log",
     success: processSummary.success,

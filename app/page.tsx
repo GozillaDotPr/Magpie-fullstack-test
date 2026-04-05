@@ -10,33 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 
-
-const orderData = [
-  { month: 'Jan', orders: 240 },
-  { month: 'Feb', orders: 221 },
-  { month: 'Mar', orders: 229 },
-  { month: 'Apr', orders: 200 },
-  { month: 'May', orders: 229 },
-  { month: 'Jun', orders: 200 },
-  { month: 'Jul', orders: 278 },
-]
-
-const ratingData = [
-  { name: '5 Star', value: 65 },
-  { name: '4 Star', value: 20 },
-  { name: '3 Star', value: 10 },
-  { name: '2 Star', value: 3 },
-  { name: '1 Star', value: 2 },
-]
-
-const recentOrders = [
-  { id: 'ORD-001', customer: 'John Doe', date: '2026-04-05', status: 'Completed', amount: '$120.50' },
-  { id: 'ORD-002', customer: 'Alice Smith', date: '2026-04-04', status: 'Processing', amount: '$45.00' },
-  { id: 'ORD-003', customer: 'Bob Johnson', date: '2026-04-04', status: 'Failed', amount: '$299.99' },
-  { id: 'ORD-004', customer: 'Sarah Williams', date: '2026-04-03', status: 'Completed', amount: '$85.20' },
-  { id: 'ORD-005', customer: 'Michael Brown', date: '2026-04-02', status: 'Completed', amount: '$12.99' },
-];
-
 const COLORS = ['#a78bfa', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
 
 const iconMap: Record<string, React.ElementType> = {

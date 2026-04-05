@@ -1,4 +1,3 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## How i handle data from api
 ### product
@@ -9,42 +8,35 @@ For product reviews, I use a delete-all-and-insert-from-scratch approach. I chos
 I opted for this approach for reviews because the current number of reviews is still relatively small. Once the dataset grows to thousands of entries, we can scale and implement a more optimized algorithm to handle the data.
 
 
-First, run the development server:
+### order
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev    
-# or
-bun dev
-```
+In this system, an order is treated as immutable once created. This means that all order-related data — including order items and other attributes — should not be modified after the order is initially created.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The only field that is allowed to change is the order status.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Therefore, the upsert logic is designed with the following rules:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Create: Insert a new order with all required data when it does not exist.
+- Update: Only update the status field if the order already exists.
 
-## Learn More
+This ensures data consistency and prevents unintended modifications to finalized order records.
 
-To learn more about Next.js, take a look at the following resources:
+## Variant Generation Strategy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### order
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To generate order variants, a new order will be created on each trigger run.
 
-## Deploy on Vercel
+The data for the new order is derived from an existing order, specifically reusing fields such as user_id and product_id. This approach ensures consistency while allowing the system to simulate or create variations of orders.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For the order_id, a random number is generated using a range between 1 and 100. This is intended to ensure uniqueness within a single process execution, where only one generated ID is expected to be used per run.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This design assumes:
 
+- Each trigger execution creates exactly one new order.
+- The randomly generated order_id will not collide within the same process.
+- Long-term global uniqueness is not guaranteed and should be handled separately if required.
 
-todo list :
+### product
 
-1. change repo to upsert
-2. fix how to handle log and failed insert in save data product
-3. order trigger
+For products, only minor variations will be introduced. The primary modification applied is to the price, while all other product attributes remain unchanged.
