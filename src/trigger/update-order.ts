@@ -1,10 +1,10 @@
-import { logger, schedules } from "@trigger.dev/sdk/v3";
+import { logger, schedules ,wait} from "@trigger.dev/sdk/v3";
 import { orderService } from "../services/order.service"
 
 
 export const updateOrder = schedules.task({
     id: "update-order",
-    cron: "* */1 * * *",
+    cron: "0 */1 * * *",
     retry: {
         maxAttempts: 3,
         factor: 2,
@@ -14,6 +14,8 @@ export const updateOrder = schedules.task({
     maxDuration: 300,
     run: async (payload, { ctx }) => {
         logger.log("Starting product update sync", { payload });
+        // reduce change race condition with product
+        await wait.for({ seconds: 30 });
 
         try {
             const result = await orderService.saveOrdersToDatabase();

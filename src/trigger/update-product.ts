@@ -4,7 +4,7 @@ import {productService} from "../services/product.service"
 
 export const updateProduct = schedules.task({
     id: "update-product",
-    cron: "* */1 * * *",
+    cron: "0 */1 * * *",
     retry: {
         maxAttempts: 3, 
         factor: 2,
