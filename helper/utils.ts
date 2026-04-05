@@ -1,3 +1,7 @@
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+
 const retry_cooldown = 5000
 
 
@@ -25,4 +29,8 @@ export const getDataApi = async (url: string) => {
   }
 
   throw new Error("Failed to connect external api")
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
