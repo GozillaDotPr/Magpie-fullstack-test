@@ -1,9 +1,10 @@
-import db from "@database/prisma";
 
 import {ProductSchema} from "@/schemas/product"
 import { getDataApi } from "@/helper/utils";
 
 import { productRepo } from "@/src/repository/product.repo";
+import { triggerLogRepo } from "@/src/repository/trigger.log.repo";
+
 
 const url = process.env.EXTERNAL_API_BASE_URL + "/api/products";
 
@@ -21,34 +22,37 @@ function validateProduct(product: any) {
 }
 
 async function validateProductsAndSave(products: any[]) {
+  var summary = {error:0,success:0}
+
   for (const product of products) {
     // clean or error
-    validateProduct(product);
-    var productID = parseInt(product.product_id);
-    var existsProduct = await productRepo.checkProductExists(productID);
-
-    if (existsProduct) {
-      await productRepo.updateDataProduct(product);
-    }else{
-      await productRepo.createDataProduct(product);
+    try{
+      validateProduct(product);
+      await productRepo.upsertProduct(product);
+      summary.success++;
+    }catch(err:any){
+      summary.error++
     }
 
   }
+  return summary
 }
 
 
 async function saveProductsToDatabase() {
   const products = await getDataFromExternalAPI();
+  const processSummary = await validateProductsAndSave(products);
+  const trigger_log = {
+    type:"product_log",
+    success: processSummary.success,
+    error : processSummary.error,
+  } 
+
   try{
-    await validateProductsAndSave(products);
-  }catch(err){
-    console.log(err)
+    await triggerLogRepo.createDataTriggerLog(trigger_log)
+  }catch{
+    console.error("Error creating trigger log")
   }
-  
-  return {
-    success: true,  
-    data : products,
-  };
 }
 
 

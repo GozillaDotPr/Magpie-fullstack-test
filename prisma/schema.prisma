@@ -25,6 +25,7 @@ model Order {
 
   order_details     Order_Detail[]
   @@map("orders")
+  @@index([order_external_id,id,updated_at])
 }
 
 model Order_Detail {
@@ -35,6 +36,7 @@ model Order_Detail {
 
   order_relation Order @relation(fields: [order_id], references: [id])
   @@map("order_details")
+  @@index([id])
 }
 
 model Product {
@@ -54,6 +56,7 @@ model Product {
 
   product_reviews     Product_review[]
 
+  @@index([product_external_id,id,updated_at])
   @@map("products")
 }
 
@@ -66,4 +69,13 @@ model Product_review{
 
   product_relation Product @relation(fields: [product_id], references: [id])
   @@map("product_reviews")
+}
+
+model Trigger_log{
+  id Int @id @default(autoincrement())
+  type String
+  success Int
+  error Int
+  created_at DateTime @default(now())
+  @@map("trigger_log")
 }
