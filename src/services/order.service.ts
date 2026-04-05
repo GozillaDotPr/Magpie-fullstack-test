@@ -19,7 +19,6 @@ function validateOrder(order: any) {
 }
 
 
-
 async function validateOrderAndSave(orders: any[]) {
   var summary = {error:0,success:0}
 
