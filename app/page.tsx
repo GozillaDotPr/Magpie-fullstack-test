@@ -1,7 +1,10 @@
-import Image from "next/image";
+'use client'
 
 import { TrendingUp, TrendingDown, ShoppingCart, Star, DollarSign, BarChart3 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/component/Card'
+
+
+import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 const dashboardStats = [
   {
@@ -33,6 +36,35 @@ const dashboardStats = [
     icon: Star,
   },
 ]
+
+const orderData = [
+  { month: 'Jan', orders: 240 },
+  { month: 'Feb', orders: 221 },
+  { month: 'Mar', orders: 229 },
+  { month: 'Apr', orders: 200 },
+  { month: 'May', orders: 229 },
+  { month: 'Jun', orders: 200 },
+  { month: 'Jul', orders: 278 },
+]
+
+const ratingData = [
+  { name: '5 Star', value: 65 },
+  { name: '4 Star', value: 20 },
+  { name: '3 Star', value: 10 },
+  { name: '2 Star', value: 3 },
+  { name: '1 Star', value: 2 },
+]
+
+const recentOrders = [
+  { id: 'ORD-001', customer: 'John Doe', date: '2026-04-05', status: 'Completed', amount: '$120.50' },
+  { id: 'ORD-002', customer: 'Alice Smith', date: '2026-04-04', status: 'Processing', amount: '$45.00' },
+  { id: 'ORD-003', customer: 'Bob Johnson', date: '2026-04-04', status: 'Failed', amount: '$299.99' },
+  { id: 'ORD-004', customer: 'Sarah Williams', date: '2026-04-03', status: 'Completed', amount: '$85.20' },
+  { id: 'ORD-005', customer: 'Michael Brown', date: '2026-04-02', status: 'Completed', amount: '$12.99' },
+];
+
+const COLORS = ['#a78bfa', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
+
 
 function StatCard({ stat }: { stat: typeof dashboardStats[0] }) {
   const Icon = stat.icon
@@ -83,8 +115,67 @@ export default function Home() {
               <StatCard key={stat.title} stat={stat} />
             ))}
           </div>
-          
-          
+
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Product count grouped by Category </CardTitle>
+                <CardDescription>Orders grouped by Status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={orderData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                    <XAxis dataKey="month" stroke="#a0aec0" />
+                    <YAxis stroke="#a0aec0" />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                      labelStyle={{ color: '#e2e8f0' }}
+                    />
+                    <Bar dataKey="orders" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle>Orders grouped by Status</CardTitle>
+              <CardDescription>Distribution of order statuses</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={ratingData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}%`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {ratingData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                    labelStyle={{ color: '#e2e8f0' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          </div>
+
+         
+           
+
+
 
         </div>
       </main>
