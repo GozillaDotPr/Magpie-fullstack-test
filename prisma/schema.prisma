@@ -48,6 +48,7 @@ model Product {
   unit String
   image String
   discount Int
+  category String
   availability Boolean
   brand String
   rating Float

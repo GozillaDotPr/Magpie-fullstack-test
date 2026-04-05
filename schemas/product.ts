@@ -12,6 +12,7 @@ export const ProductSchema = z.object({
     .refine(val => typeof val === "number", { message: "Product external ID must be a number" }),
   name: z.string().nonempty({ message: "Product name is required" }),
   description: z.string().nonempty({ message: "Description is required" }),
+  category: z.string().nonempty({ message: "Category is required" }),
   price: z.number()
     .min(0, { message: "Price cannot be negative" }),
   unit: z.string().nonempty({ message: "Unit is required" }),
