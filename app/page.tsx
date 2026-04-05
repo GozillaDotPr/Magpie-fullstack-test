@@ -59,8 +59,10 @@ export default function Home() {
   const { data: orderLatestData, isLoading: isLatestLoading } = useSWR('/api/order', fetcher);
   const { data: productCategoryData, isLoading: isCategoryLoading } = useSWR('/api/product/category', fetcher);
   const { data: productTopData, isLoading: isTopLoading } = useSWR('/api/product/top', fetcher);
+  const { data: productRatingData, isLoading: isRatingLoading } = useSWR('/api/product/rating', fetcher);
 
-  if (isStatusLoading || isSummaryLoading || isLatestLoading || isCategoryLoading || isTopLoading) {
+
+  if (isStatusLoading || isSummaryLoading || isLatestLoading || isCategoryLoading || isTopLoading || isRatingLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black">
         <div className="text-primary animate-pulse font-semibold">
@@ -228,6 +230,39 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Product Range Rating</CardTitle>
+                <CardDescription>Distribution of product ratings</CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-center justify-center">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={productRatingData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {productRatingData.map((entry:any, index:any) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                      labelStyle={{ color: '#e2e8f0' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+        </div>
         </div>
       </main>
     </div>
