@@ -140,40 +140,134 @@ export default function Home() {
             </Card>
 
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle>Orders grouped by Status</CardTitle>
-              <CardDescription>Distribution of order statuses</CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center">
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={ratingData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}%`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {ratingData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
-                    labelStyle={{ color: '#e2e8f0' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+              <CardHeader>
+                <CardTitle>Orders grouped by Status</CardTitle>
+                <CardDescription>Distribution of order statuses</CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-center justify-center">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={ratingData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}%`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {ratingData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                      labelStyle={{ color: '#e2e8f0' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
           </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Recent Orders</CardTitle>
+                <CardDescription>Recent orders made by customers</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
+                      <tr>
+                        {/* whitespace-nowrap mencegah teks patah ke bawah di layar kecil */}
+                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Order ID</th>
+                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Customer</th>
+                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Date</th>
+                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Status</th>
+                        <th scope="col" className="px-6 py-4 text-right whitespace-nowrap">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-primary/10 text-foreground/80">
+                      {recentOrders.map((order) => (
+                        <tr key={order.id} className="hover:bg-primary/5 transition-colors">
+                          <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">
+                            {order.id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">{order.customer}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{order.date}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {/* Badge Status untuk mempercantik UI */}
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium 
+                    ${order.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                                order.status === 'Processing' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
+                                  'bg-red-500/10 text-red-500 border border-red-500/20'}`}
+                            >
+                              {order.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right font-medium whitespace-nowrap">
+                            {order.amount}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-         
-           
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Top Products</CardTitle>
+                <CardDescription>Most popular products based on recent orders</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
+                      <tr>
+                        {/* whitespace-nowrap mencegah teks patah ke bawah di layar kecil */}
+                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Order ID</th>
+                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Customer</th>
+                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Date</th>
+                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Status</th>
+                        <th scope="col" className="px-6 py-4 text-right whitespace-nowrap">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-primary/10 text-foreground/80">
+                      {recentOrders.map((order) => (
+                        <tr key={order.id} className="hover:bg-primary/5 transition-colors">
+                          <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">
+                            {order.id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">{order.customer}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{order.date}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {/* Badge Status untuk mempercantik UI */}
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium 
+                    ${order.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                                order.status === 'Processing' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
+                                  'bg-red-500/10 text-red-500 border border-red-500/20'}`}
+                            >
+                              {order.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right font-medium whitespace-nowrap">
+                            {order.amount}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+
 
 
 
