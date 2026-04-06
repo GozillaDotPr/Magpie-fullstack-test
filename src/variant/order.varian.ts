@@ -10,7 +10,7 @@ function addVariant(order: any) {
     }else{
         status = "Processing"
     }
-    const variant = { order_id: randomMath(1, 100), user_id: randomMath(1, 100), items: [ { product_id: randomMath(1, 8), quantity: randomMath(1, 5) }, { product_id: randomMath(1, 5), quantity: randomMath(1, 5) } ], total_price: randomMath(100, 1000), status: status }
+    const variant = { order_id: randomMath(1, 100), user_id: randomMath(1, 100), items: [ { product_id: randomMath(1, 8), quantity: randomMath(1, 5) }, { product_id: randomMath(1, 5), quantity: randomMath(1, 5) } ], total_price: randomMath(100, 1000), status: "Delivered" }
     order.push(variant)
     return order
 }
