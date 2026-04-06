@@ -52,10 +52,11 @@ export default function Home() {
   const { data: summaryData, isLoading: isSummaryLoading } = useSWR('/api/summary', fetcher);
   const { data: orderLatestData, isLoading: isLatestLoading } = useSWR('/api/order', fetcher);
   const { data: productCategoryData, isLoading: isCategoryLoading } = useSWR('/api/product/category', fetcher);
-  const { data: productTopData, isLoading: isTopLoading } = useSWR('/api/product/top', fetcher);
+  const { data: productTopData, isLoading: isTopLoading } = useSWR('/api/product/top/price', fetcher);
   const { data: productRatingData, isLoading: isRatingLoading } = useSWR('/api/product/rating', fetcher);
+  const { data: productTopRevenue, isLoading: isTopRevenueLoading } = useSWR('/api/product/top/revenue', fetcher);
 
-  if (isStatusLoading || isSummaryLoading || isLatestLoading || isCategoryLoading || isTopLoading || isRatingLoading) {
+  if (isStatusLoading || isSummaryLoading || isLatestLoading || isCategoryLoading || isTopLoading || isRatingLoading || isTopRevenueLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black px-4">
         <div className="text-primary animate-pulse font-semibold text-center">
@@ -69,13 +70,16 @@ export default function Home() {
     <div className="flex flex-col flex-1 w-full bg-zinc-50 font-sans dark:bg-black">
       {/* Padding dinamis: p-4 di mobile, p-6 di tablet, p-8 di laptop */}
       <main className="min-h-screen w-full p-4 sm:p-6 lg:p-8 bg-background dark:bg-gradient-to-br dark:from-background dark:via-background dark:to-primary/5">
-        
+
         {/* Container utama dengan max-width agar tidak melebar tak terbatas di monitor ultra-wide */}
         <div className="mx-auto max-w-7xl space-y-6 lg:space-y-8">
-          
+
           <div className="space-y-2">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Overview Dashboard</h1>
             <p className="text-sm sm:text-base text-foreground/60">Welcome back! Here&apos;s your business metrics.</p>
+            <p className="text-sm sm:text-base text-foreground/60">
+              Please note that all data shown here is dummy data and may not be entirely consistent.
+            </p>
           </div>
 
           {/* Stat Cards: 1 kolom di HP, 2 di tablet, 4 di laptop */}
@@ -159,7 +163,7 @@ export default function Home() {
                   <table className="w-full text-sm text-left min-w-[500px]">
                     <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
                       <tr>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Order ID</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">ID</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Date</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Status</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">Amount</th>
@@ -190,7 +194,7 @@ export default function Home() {
 
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">Top Products</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Top Products by Price</CardTitle>
                 <CardDescription>Most popular products based on price</CardDescription>
               </CardHeader>
               <CardContent>
@@ -207,14 +211,14 @@ export default function Home() {
                     </thead>
                     <tbody className="divide-y divide-primary/10 text-foreground/80">
                       {productTopData.map((product: any) => (
-                        <tr key={product.product_external_id} className="hover:bg-primary/5 transition-colors">
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{product.product_external_id}</td>
+                        <tr key={product.id} className="hover:bg-primary/5 transition-colors">
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{product.id}</td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.name}</td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.brand}</td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
                             {product.rating} <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
                           </td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 text-right font-medium whitespace-nowrap">{product.price}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 text-right font-medium whitespace-nowrap">${product.price}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -226,6 +230,40 @@ export default function Home() {
 
           {/* Rating Chart: Dibuat berdiri sendiri atau siap untuk ditemani widget lain */}
           <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl">Top Products by Revenue</CardTitle>
+                <CardDescription>Most popular products based on revenue. revenue data based on the latest item prices</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full overflow-x-auto pb-2 custom-scrollbar">
+                  <table className="w-full text-sm text-left min-w-[600px]">
+                    <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
+                      <tr>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">ID</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Name</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Sold</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Revenue</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-primary/10 text-foreground/80">
+                      {productTopRevenue.map((product: any) => (
+                        <tr key={product.product_id} className="hover:bg-primary/5 transition-colors">
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{product.product_id}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.name}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.sold}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
+                            ${product.total_revenue} 
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl">Product Range Rating</CardTitle>

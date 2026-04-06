@@ -70,17 +70,21 @@ async function getRecentOrders() {
       style: 'currency',
       currency: 'USD',
     });
+
+    let no = 1;
   
     const formattedRecentOrders = recentOrdersData.map((order: any) => ({
-      id: order.order_external_id,
+      id: no,
       date: new Intl.DateTimeFormat('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
       }).format(order.created_at),
       status: order.status,
-      amount: formatter.format(order.total_price || 0)
+      amount: formatter.format(order.total_price || 0),
+      no: no++
     }));
+
   return formattedRecentOrders
 }
 

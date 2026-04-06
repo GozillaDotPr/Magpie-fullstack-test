@@ -47,20 +47,34 @@ async function getRecentOrders() {
 }
 
 async function totalOrder() {
-    
-  return await db.order.count();
+
+    return await db.order.count();
 }
 
 async function getTotalRevenue() {
     const result = await db.order.aggregate({
-    _sum: {
-      total_price: true,
-    },
-  });
+        _sum: {
+            total_price: true,
+        },
+    });
 
-  const totalRevenue = result._sum.total_price || 0
+    const totalRevenue = result._sum.total_price || 0
 
-  return totalRevenue
+    return totalRevenue
+}
+
+async function getSoldProductOnOrderItems(data: number) {
+    const result = await db.order_Detail.groupBy({
+        by: ['product_id'],
+        where: {
+            product_id: data,
+        },
+        _sum: {
+            quantity: true,
+        },
+    })
+
+    return result[0]?._sum.quantity ?? 0
 }
 
 export const orderRepo = {
@@ -69,4 +83,5 @@ export const orderRepo = {
     getRecentOrders,
     totalOrder,
     getTotalRevenue,
+    getSoldProductOnOrderItems,
 }
