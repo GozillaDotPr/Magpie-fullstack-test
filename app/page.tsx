@@ -266,7 +266,7 @@ export default function Home() {
                   <table className="w-full text-sm text-left min-w-[600px]">
                     <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
                       <tr>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">ID</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">No</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Name</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Brand</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Rating</th>
@@ -315,7 +315,7 @@ export default function Home() {
                   <table className="w-full text-sm text-left min-w-[500px]">
                     <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
                       <tr>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">ID</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">No</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Date</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Status</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">Amount</th>
@@ -355,7 +355,7 @@ export default function Home() {
                   <table className="w-full text-sm text-left min-w-[600px]">
                     <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
                       <tr>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">ID</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">No</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Name</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Sold</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Revenue</th>
