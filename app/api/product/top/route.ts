@@ -1,13 +1,7 @@
-import db from "@database/prisma"
 import { NextResponse } from "next/server"
+import { productService } from "@/services/product.service";
 
 export async function GET() {
-  const topProducts = await db.product.findMany({
-    orderBy: {
-      price: 'desc',
-    },
-    take: 5,
-  });
-
+  const topProducts = await productService.getTopProductsByPrice()
   return NextResponse.json(topProducts);
 }

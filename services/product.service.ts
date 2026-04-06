@@ -2,8 +2,8 @@
 import {ProductSchema} from "@/schemas/product"
 import { getDataApi } from "@/helper/utils";
 
-import { productRepo } from "@/src/repository/product.repo";
-import { triggerLogRepo } from "@/src/repository/trigger.log.repo";
+import { productRepo } from "@/repository/product.repo";
+import { triggerLogRepo } from "@/repository/trigger.log.repo";
 
 import {productVariant} from "@/src/variant/product.variant"
 
@@ -60,6 +60,63 @@ async function saveProductsToDatabase() {
 }
 
 
+async function groupProductsByCategory() {
+  const groupedProducts = await productRepo.groupProductsByCategory();
+
+    const chartData = groupedProducts.map((item:any) => ({
+        name: item.category,
+        count: item._count._all,
+    }));
+    return chartData
+}
+
+
+async function getRatingRange() {
+  const ratingsData = await productRepo.getMany();
+
+  const tmp = {
+    "4.7-5":0,
+    "4.5-4.7":0,
+    "3-4.5":0,
+    "0-3":0
+  }
+    const ratings = ratingsData.map((item: any) => {
+      const nilaiRating = Number(item.rating) || 0; 
+
+
+      if (nilaiRating >= 4.7) {
+        tmp["4.7-5"]++;
+      } 
+      else if (nilaiRating >= 4.5) { 
+
+        tmp["4.5-4.7"]++;
+      } 
+      else if (nilaiRating >= 3.0) {
+
+        tmp["3-4.5"]++;
+      } 
+      else {
+        tmp["0-3"]++;
+      } 
+    });
+
+  
+
+   const formattedRatings = Object.keys(tmp).map((key) => ({
+        name: key,
+        value: tmp[key as keyof typeof tmp] 
+    }));
+
+   return formattedRatings;
+}
+
+async function getTopProductsByPrice() {
+  const topProducts = await productRepo.getTopProductsByPrice();
+  return topProducts
+}
 export const productService = {
   saveProductsToDatabase,
+  groupProductsByCategory,
+  getRatingRange,
+  getTopProductsByPrice
 };

@@ -40,3 +40,7 @@ This design assumes:
 ### product
 
 For products, only minor variations will be introduced. The primary modification applied is to the price, while all other product attributes remain unchanged.
+
+
+1. fe interagtif
+2. more variant

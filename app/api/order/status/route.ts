@@ -1,17 +1,9 @@
-import db from "@/database/prisma";
 import { NextResponse } from "next/server";
+import { orderService } from "@/services/order.service";
+
 
 export async function GET() {
-  const groupedOrders = await db.order.groupBy({
-  by: ['status'], 
-  _count: {
-    _all: true,
-  },
-});
-  const formattedForChart = groupedOrders.map((item:any) => ({
-    name: item.status,          
-    value: item._count._all,
-  }));
+  const formattedForChart = await orderService.getOrderStatus();
 
   return NextResponse.json(formattedForChart);
 }

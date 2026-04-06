@@ -1,5 +1,5 @@
 import { logger, schedules } from "@trigger.dev/sdk/v3";
-import {productService} from "../services/product.service"
+import {productService} from "@/services/product.service"
 
 
 export const updateProduct = schedules.task({

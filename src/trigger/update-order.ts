@@ -1,5 +1,5 @@
 import { logger, schedules ,wait} from "@trigger.dev/sdk/v3";
-import { orderService } from "../services/order.service"
+import { orderService } from "@/services/order.service"
 
 
 export const updateOrder = schedules.task({

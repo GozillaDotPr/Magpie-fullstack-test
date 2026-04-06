@@ -109,8 +109,43 @@ async function upsertProduct(data:ProductType){
   });
 }
 
-export const productRepo = {
+async function groupProductsByCategory() {
+  return await db.product.groupBy({
+        by: ['category'],
+        _count: {
+            _all: true,
+        },
+    });
+}
 
+async function getTopProductsByPrice() {
+  return await db.product.findMany({
+    orderBy: {
+      price: 'desc',
+    },
+    take: 5,
+  });
+}
+
+async function getMany() {
+  return await db.product.findMany();
+}
+
+async function getAverageRating() {
+  const resultAvgratingProduct = await db.product.aggregate({
+    _avg: {
+      rating: true,
+    },
+  });
+
+  return resultAvgratingProduct._avg.rating || 0;
+}
+
+export const productRepo = {
+  groupProductsByCategory,
   upsertProduct,
+  getTopProductsByPrice,
+  getMany,
+  getAverageRating,
 }
 

@@ -1,8 +1,8 @@
 import { getDataApi } from "@/helper/utils";
 import { OrderSchema } from "@/schemas/order";
 
-import {orderRepo} from "@/src/repository/order.repo"
-import { triggerLogRepo } from "@/src/repository/trigger.log.repo";
+import {orderRepo} from "@/repository/order.repo"
+import { triggerLogRepo } from "@/repository/trigger.log.repo";
 
 import {orderVariant} from "@/src/variant/order.varian"
 
@@ -53,6 +53,39 @@ async function saveOrdersToDatabase() {
   return processSummary
 }
 
+async function getOrderStatus() {
+  const groupedOrders = await orderRepo.groupOrdersByStatus();
+  
+  const formattedForChart = groupedOrders.map((item:any) => ({
+    name: item.status,          
+    value: item._count._all,
+  }));
+  return formattedForChart
+}
+
+async function getRecentOrders() {
+  const recentOrdersData = await orderRepo.getRecentOrders();
+  
+    const formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+  
+    const formattedRecentOrders = recentOrdersData.map((order: any) => ({
+      id: order.order_external_id,
+      date: new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      }).format(order.created_at),
+      status: order.status,
+      amount: formatter.format(order.total_price || 0)
+    }));
+  return formattedRecentOrders
+}
+
 export const orderService = {
-    saveOrdersToDatabase
+    saveOrdersToDatabase,
+    getOrderStatus,
+    getRecentOrders
 }
