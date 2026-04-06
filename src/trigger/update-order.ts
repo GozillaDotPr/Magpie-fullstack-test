@@ -15,7 +15,7 @@ export const updateOrder = schedules.task({
     run: async (payload, { ctx }) => {
         logger.log("Starting product update sync", { payload });
         // reduce change race condition with product
-        // await wait.for({ seconds: 30 });
+        await wait.for({ seconds: 10 });
 
         try {
             const result = await orderService.saveOrdersToDatabase();
@@ -23,7 +23,7 @@ export const updateOrder = schedules.task({
             if (result.error > 0) {
                 logger.warn(`${result.error} records failed validation or saving`, { result });
             } else {
-                logger.log("All orders updated successfully", { result });
+                logger.log("All orders updated successfully");
             }
 
         } catch (error: any) {
