@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
+/* 1. Langsung pasang warna gelap di sini */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a; /* Warna background gelap */
+  --foreground: #ededed; /* Warna teks terang */
 }
 
 @theme inline {
@@ -12,12 +13,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* 2. HAPUS SEPENUHNYA blok @media (prefers-color-scheme: dark) */
 
 body {
   background: var(--background);
