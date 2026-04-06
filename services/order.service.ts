@@ -6,6 +6,8 @@ import { triggerLogRepo } from "@/repository/trigger.log.repo";
 
 import {orderVariant} from "@/src/variant/order.varian"
 
+import { formatterMoney } from "@/helper/utils";
+
 const url = process.env.EXTERNAL_API_BASE_URL + "/api/orders";
 
 async function getDataFromExternalAPI() {
@@ -66,11 +68,6 @@ async function getOrderStatus() {
 async function getRecentOrders() {
   const recentOrdersData = await orderRepo.getRecentOrders();
   
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    });
-
     let no = 1;
   
     const formattedRecentOrders = recentOrdersData.map((order: any) => ({
@@ -81,7 +78,7 @@ async function getRecentOrders() {
         year: 'numeric'
       }).format(order.created_at),
       status: order.status,
-      amount: formatter.format(order.total_price || 0),
+      amount: formatterMoney(order.total_price || 0, 2),
       no: no++
     }));
 

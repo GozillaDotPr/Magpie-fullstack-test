@@ -43,3 +43,12 @@ export const randomMath = (min: number, max: number) => {
 // export const randomRating = (min: number, max: number) => {
 //   return Number((Math.random() * (max - min) + min).toFixed(1))
 // }
+
+export const formatterMoney = (value:number,desimal:number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: desimal,
+    maximumFractionDigits: desimal
+  }).format(value) || 0;
+}

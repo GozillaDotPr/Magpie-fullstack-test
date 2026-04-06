@@ -14,7 +14,6 @@ import { useStore } from "@/store/useStore";
 
 const menuItems = [
   { text: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { text: 'Settings', icon: Settings, path: '/settings' },
 ];
 
 function useIsMobile(breakpoint = 900) {
@@ -95,19 +94,7 @@ const Sidebar = () => {
         })}
       </List>
       <Divider />
-      <List sx={{ mt: 'auto' }}>
-        <ListItem disablePadding>
-          <ListItemButton sx={{ '&:hover': { bgcolor: 'rgba(211, 47, 47, 0.1)' } }}>
-            <ListItemIcon sx={{ color: theme.palette.error.main }}>
-              <LogOut size={20} />
-            </ListItemIcon>
-            <ListItemText 
-              primary="Logout" 
-              sx={{ opacity: isMobile ? 1 : (isOpen ? 1 : 0) }} 
-            />
-          </ListItemButton>
-        </ListItem>
-      </List>
+      
     </Drawer>
   );
 };

@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,AreaChart,Area } from 'recharts'
 
 
+import CountUp from 'react-countup';
+
 
 const COLORS = ['#a78bfa', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
 
@@ -16,15 +18,7 @@ const iconMap: Record<string, React.ElementType> = {
   Star: Star,
 };
 
-const revenueData = [
-  { month: '7h ago', revenue: 4000 },
-  { month: '6h ago', revenue: 3000 },
-  { month: '5h ago', revenue: 2000 },
-  { month: '4h ago', revenue: 2780 },
-  { month: '3h ago', revenue: 1890 },
-  { month: '2h ago', revenue: 2390 },
-  { month: '1h ago', revenue: 3490 },
-]
+
 
 function StatCard({ stat }: { stat: any }) {
   const Icon = iconMap[stat.icon]
@@ -36,7 +30,9 @@ function StatCard({ stat }: { stat: any }) {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col space-y-2">
-          <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+          <div className="text-2xl font-bold text-foreground">
+            <CountUp end={stat.value} duration={2} separator="," prefix={stat.isMoney ? "$" : ""} decimals={stat.desimal} />{stat.rating ? "/5":""}
+          </div>
           <div className="flex items-center space-x-1 text-sm">
             {stat.isPositive ? (
               <>
@@ -235,7 +231,7 @@ export default function Home() {
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
                             {product.rating} <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
                           </td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 text-right font-medium whitespace-nowrap">${product.price}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 text-right font-medium whitespace-nowrap">{product.price}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -271,7 +267,7 @@ export default function Home() {
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.name}</td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.sold}</td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
-                            ${product.total_revenue} 
+                            {product.total_revenue} 
                           </td>
                         </tr>
                       ))}

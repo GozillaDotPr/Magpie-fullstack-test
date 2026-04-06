@@ -6,7 +6,7 @@ import { productRepo } from "@/repository/product.repo";
 import { triggerLogRepo } from "@/repository/trigger.log.repo";
 import { orderRepo } from "@/repository/order.repo";
 
-
+import {formatterMoney} from "@/helper/utils"
 import { productVariant } from "@/src/variant/product.variant"
 
 
@@ -118,6 +118,7 @@ async function getTopProductsByPrice() {
 
   const top = topProducts.map((item: any) => ({
     ...item,
+    price: formatterMoney(item.price, 2),
     id: no,
     no: no++,
   }))
@@ -132,7 +133,7 @@ async function getTopProductsByRevenue() {
     reve.map(async (item: any,index: number) => ({
       ...item,
       product_id:index+1,
-      total_revenue:item.total_revenue.toFixed(2),
+      total_revenue:formatterMoney(item.total_revenue,2),
       sold: await orderRepo.getSoldProductOnOrderItems(item.product_id),
     }))
   )

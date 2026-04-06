@@ -21,10 +21,13 @@ async function getSummaryData() {
   const dashboardStats = [
     {
       title: 'Total Revenue',
-      value: "$" + totalRevenue.toFixed(2),
+      value: totalRevenue,
       change: '+20.1%',
       isPositive: true,
       icon: "DollarSign",
+      isMoney:true,
+      desimal:2,
+      rating:false
     },
     {
       title: 'Total Order Count',
@@ -32,20 +35,31 @@ async function getSummaryData() {
       change: '+12.5%',
       isPositive: true,
       icon: "ShoppingCart",
+      isMoney:false,
+      desimal:0,
+      rating:false
+
     },
     {
       title: 'Average Order Value',
-      value: "$" + avgRevenue.toFixed(2),
+      value: avgRevenue,
       change: '-4.3%',
       isPositive: false,
       icon: "BarChart3",
+      isMoney:true,
+      desimal:2,
+      rating:false
+
     },
     {
       title: 'Average Product Rating',
-      value: averageRatingProduct.toFixed(1) + '/5',
+      value: averageRatingProduct,
       change: '+2.1%',
       isPositive: true,
       icon: "Star",
+      isMoney:false,
+      desimal:1,
+      rating:true
     },
   ]
   return dashboardStats
