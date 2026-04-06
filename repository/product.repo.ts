@@ -4,6 +4,7 @@ import { ProductType } from "@/schemas/product"
 
 interface productRevenue{
   product_id :number,
+  id:number,
   name:string,
   total_revenue:number
 }
@@ -98,15 +99,26 @@ async function getTopProductsByRevenue() {
   const totalRevenueByProduct = await db.$queryRaw<productRevenue[]>`
   SELECT 
     od.product_id, 
+    p.id,
     p.name, 
     SUM(p.price * od.quantity) AS total_revenue
   FROM order_details od
   JOIN products p ON od.product_id = p.product_external_id 
-  GROUP BY od.product_id, p.name
+  GROUP BY od.product_id, p.name,p.id
   ORDER BY total_revenue DESC limit 5
 `;
   
   return totalRevenueByProduct
+}
+
+async function getOneWithID(id:number) {
+    const product = await db.product.findFirst({
+    where: {
+        id: id
+    }
+    });
+
+    return product
 }
 
 export const productRepo = {
@@ -116,5 +128,7 @@ export const productRepo = {
   getMany,
   getAverageRating,
   getTopProductsByRevenue,
+  getOneWithID,
+
 }
 

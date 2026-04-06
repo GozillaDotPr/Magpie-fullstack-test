@@ -1,9 +1,25 @@
 'use client'
 
 import useSWR from 'swr';
-import { TrendingUp, TrendingDown, ShoppingCart, Star, DollarSign, BarChart3 } from 'lucide-react'
+import { TrendingUp, TrendingDown, ShoppingCart, Star, DollarSign, BarChart3, Eye } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/component/Card'
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,AreaChart,Area } from 'recharts'
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "@/component/Dialog"
+
+import { Button } from '@/component/Button';
+
+import React, { useState, useEffect } from 'react';
 
 
 import CountUp from 'react-countup';
@@ -20,6 +36,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 
 
+
 function StatCard({ stat }: { stat: any }) {
   const Icon = iconMap[stat.icon]
   return (
@@ -31,7 +48,7 @@ function StatCard({ stat }: { stat: any }) {
       <CardContent>
         <div className="flex flex-col space-y-2">
           <div className="text-2xl font-bold text-foreground">
-            <CountUp end={stat.value} duration={2} separator="," prefix={stat.isMoney ? "$" : ""} decimals={stat.desimal} />{stat.rating ? "/5":""}
+            <CountUp end={stat.value} duration={2} separator="," prefix={stat.isMoney ? "$" : ""} decimals={stat.desimal} />{stat.rating ? "/5" : ""}
           </div>
           <div className="flex items-center space-x-1 text-sm">
             {stat.isPositive ? (
@@ -56,6 +73,11 @@ function StatCard({ stat }: { stat: any }) {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [detail, setDetail] = useState<any>(null);
+
   const { data: orderStatusData, isLoading: isStatusLoading } = useSWR('/api/order/status', fetcher);
   const { data: summaryData, isLoading: isSummaryLoading } = useSWR('/api/summary', fetcher);
   const { data: orderLatestData, isLoading: isLatestLoading } = useSWR('/api/order', fetcher);
@@ -64,6 +86,12 @@ export default function Home() {
   const { data: productRatingData, isLoading: isRatingLoading } = useSWR('/api/product/rating', fetcher);
   const { data: productTopRevenue, isLoading: isTopRevenueLoading } = useSWR('/api/product/top/revenue', fetcher);
   const { data: order7hRevenue, isLoading: isOrder7hRevenueLoading } = useSWR('/api/order/revenue', fetcher);
+
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const { data: detailData, isLoading: isDetailLoading } = useSWR(
+    isOpen && selectedProductId ? `/api/product/item?id=${selectedProductId}` : null,
+    fetcher
+  );
 
 
   if (isStatusLoading || isSummaryLoading || isLatestLoading || isCategoryLoading || isTopLoading || isRatingLoading || isTopRevenueLoading || isOrder7hRevenueLoading) {
@@ -75,6 +103,14 @@ export default function Home() {
       </div>
     );
   }
+
+
+
+  const handleOpen = (id: number) => {
+    setSelectedProductId(id);
+    setIsOpen(true);
+  };
+
 
   return (
     <div className="flex flex-col flex-1 w-full bg-zinc-50 font-sans dark:bg-black">
@@ -161,8 +197,113 @@ export default function Home() {
             </Card>
           </div>
 
-            {/* recent order */}
+
           <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+            {/* product top revenue */}
+
+
+
+            {/* revenue order */}
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl">Product Rating</CardTitle>
+                <CardDescription>Distribution of product ratings</CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-center justify-center">
+                <div className="h-[250px] sm:h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={productRatingData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                      {/* Hide text on very small screens if it overlaps, or keep it responsive */}
+                      <XAxis dataKey="name" stroke="#a0aec0" fontSize={12} tickMargin={8} />
+                      <YAxis stroke="#a0aec0" fontSize={12} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                        labelStyle={{ color: '#e2e8f0' }}
+                      />
+                      <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} maxBarSize={50} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Revenue Trend</CardTitle>
+                <CardDescription>Revenue in the last 7 hours. Each unit (1h) represents one hour back and format revenue is in USD</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={order7hRevenue}>
+                    <defs>
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#a78bfa" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                    <XAxis dataKey="hour" stroke="#a0aec0" />
+                    <YAxis stroke="#a0aec0" />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                      labelStyle={{ color: '#e2e8f0' }}
+                    />
+                    <Area type="monotone" dataKey="revenue" stroke="#a78bfa" fillOpacity={1} fill="url(#colorRevenue)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-1">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl">Top Products by Price</CardTitle>
+                <CardDescription>Most popular products based on price</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full overflow-x-auto pb-2 custom-scrollbar">
+                  <table className="w-full text-sm text-left min-w-[600px]">
+                    <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
+                      <tr>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">ID</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Name</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Brand</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Rating</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Price</th>
+
+
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Actions</th>
+
+
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-primary/10 text-foreground/80">
+                      {productTopData.map((product: any) => (
+                        <tr key={product.id} className="hover:bg-primary/5 transition-colors">
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{product.id}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.name}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.brand}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
+                            {product.rating} <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                          </td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.price}</td>
+
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
+                            <Button variant="outline" size="sm" onClick={() => handleOpen(product.product_id)} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                              <Eye className="h-4 w-4 mr-2" /> View
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-1">
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl">Recent Orders</CardTitle>
@@ -202,48 +343,8 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
-
-
-            {/* product top price */}
-            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">Top Products by Price</CardTitle>
-                <CardDescription>Most popular products based on price</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="w-full overflow-x-auto pb-2 custom-scrollbar">
-                  <table className="w-full text-sm text-left min-w-[600px]">
-                    <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
-                      <tr>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">ID</th>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Name</th>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Brand</th>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Rating</th>
-                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">Price</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-primary/10 text-foreground/80">
-                      {productTopData.map((product: any) => (
-                        <tr key={product.id} className="hover:bg-primary/5 transition-colors">
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{product.id}</td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.name}</td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.brand}</td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
-                            {product.rating} <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                          </td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 text-right font-medium whitespace-nowrap">{product.price}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
           </div>
-
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-                      {/* product top revenue */}
-
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-1">
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl">Top Products by Revenue</CardTitle>
@@ -258,17 +359,23 @@ export default function Home() {
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Name</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Sold</th>
                         <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Revenue</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-primary/10 text-foreground/80">
                       {productTopRevenue.map((product: any) => (
-                        <tr key={product.product_id} className="hover:bg-primary/5 transition-colors">
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{product.product_id}</td>
+                        <tr key={product.id} className="hover:bg-primary/5 transition-colors">
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{product.id}</td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.name}</td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.sold}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.total_revenue}</td>
+
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
-                            {product.total_revenue} 
+                            <Button variant="outline" size="sm" onClick={() => handleOpen(product.product_id)} className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                              <Eye className="h-4 w-4 mr-2" /> View
+                            </Button>
                           </td>
+
                         </tr>
                       ))}
                     </tbody>
@@ -276,64 +383,41 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* product rating */}
-            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">Product Rating</CardTitle>
-                <CardDescription>Distribution of product ratings</CardDescription>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center">
-                 <div className="h-[250px] sm:h-[300px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={productRatingData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                      {/* Hide text on very small screens if it overlaps, or keep it responsive */}
-                      <XAxis dataKey="name" stroke="#a0aec0" fontSize={12} tickMargin={8} />
-                      <YAxis stroke="#a0aec0" fontSize={12} />
-                      <Tooltip
-                        contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
-                        labelStyle={{ color: '#e2e8f0' }}
-                      />
-                      <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} maxBarSize={50} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-            {/* Tempat kosong ini bisa digunakan untuk widget selanjutnya */}
-          </div>
-          
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle>Revenue Trend</CardTitle>
-              <CardDescription>Revenue in the last 7 hours. Each unit (1h) represents one hour back and format revenue is in USD</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={order7hRevenue}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#a78bfa" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                  <XAxis dataKey="hour" stroke="#a0aec0" />
-                  <YAxis stroke="#a0aec0" />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
-                    labelStyle={{ color: '#e2e8f0' }}
-                  />
-                  <Area type="monotone" dataKey="revenue" stroke="#a78bfa" fillOpacity={1} fill="url(#colorRevenue)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
           </div>
         </div>
       </main>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Product Details</DialogTitle>
+            <DialogDescription>
+              Detail informasi produk.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="min-h-[150px] flex flex-col justify-center">
+            {isDetailLoading && (
+              <div className="flex flex-col items-center justify-center space-y-3">
+                <p className="text-sm text-muted-foreground">Mengambil data...</p>
+              </div>
+            )}
+
+            {detailData && (
+              <div className="space-y-2 text-sm">
+                <p><strong>Name:</strong> {detailData.name}</p>
+                <p><strong>Brand:</strong> {detailData.brand}</p>
+                <p><strong>Price:</strong> {detailData.price}</p>
+                <p><strong>Description:</strong> {detailData.description}</p>
+              </div>
+            )}
+
+
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+
+
   );
 }

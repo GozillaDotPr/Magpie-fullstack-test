@@ -120,6 +120,7 @@ async function getTopProductsByPrice() {
     ...item,
     price: formatterMoney(item.price, 2),
     id: no,
+    product_id:item.id,
     no: no++,
   }))
 
@@ -132,12 +133,17 @@ async function getTopProductsByRevenue() {
   const val = await Promise.all(
     reve.map(async (item: any,index: number) => ({
       ...item,
-      product_id:index+1,
+      id:index+1,
+      product_id:item.id,
+
       total_revenue:formatterMoney(item.total_revenue,2),
       sold: await orderRepo.getSoldProductOnOrderItems(item.product_id),
     }))
   )
   return val
+}
+async function getOneProductByID(id: number) {
+  return await productRepo.getOneWithID(id);
 }
 export const productService = {
   saveProductsToDatabase,
@@ -145,4 +151,5 @@ export const productService = {
   getRatingRange,
   getTopProductsByPrice,
   getTopProductsByRevenue,
+  getOneProductByID,
 };
