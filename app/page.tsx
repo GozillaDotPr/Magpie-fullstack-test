@@ -1,25 +1,20 @@
 'use client'
 
-
 import useSWR from 'swr';
-
 import { TrendingUp, TrendingDown, ShoppingCart, Star, DollarSign, BarChart3 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/component/Card'
-
-
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-
 
 const COLORS = ['#a78bfa', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
 
 const iconMap: Record<string, React.ElementType> = {
-    DollarSign: DollarSign,
-    ShoppingCart: ShoppingCart,
-    BarChart3: BarChart3,
-    Star: Star,
-  };
+  DollarSign: DollarSign,
+  ShoppingCart: ShoppingCart,
+  BarChart3: BarChart3,
+  Star: Star,
+};
 
-function StatCard({ stat }: { stat:any }) {
+function StatCard({ stat }: { stat: any }) {
   const Icon = iconMap[stat.icon]
   return (
     <Card className="relative overflow-hidden border-primary/20 bg-card/50 backdrop-blur-sm hover:border-primary/40 transition-colors">
@@ -42,14 +37,13 @@ function StatCard({ stat }: { stat:any }) {
                 <span className="text-red-500">{stat.change}</span>
               </>
             )}
-            <span className="text-foreground/60">from last month</span>
+            <span className="text-foreground/60 break-words">from last month</span>
           </div>
         </div>
       </CardContent>
     </Card>
   )
 }
-
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -61,128 +55,131 @@ export default function Home() {
   const { data: productTopData, isLoading: isTopLoading } = useSWR('/api/product/top', fetcher);
   const { data: productRatingData, isLoading: isRatingLoading } = useSWR('/api/product/rating', fetcher);
 
-
   if (isStatusLoading || isSummaryLoading || isLatestLoading || isCategoryLoading || isTopLoading || isRatingLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
-        <div className="text-primary animate-pulse font-semibold">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black px-4">
+        <div className="text-primary animate-pulse font-semibold text-center">
           Memuat Dashboard...
         </div>
       </div>
     );
   }
- 
-  
-  
-  return (
-    
-    <div className="flex flex-col flex-1 w-full bg-zinc-50 font-sans dark:bg-black">
-      <main className="min-h-screen w-full p-6 md:p-8 bg-background dark:bg-gradient-to-br dark:from-background dark:via-background dark:to-primary/5">
-        <div className="space-y-8 p-6 md:p-10">
 
+  return (
+    <div className="flex flex-col flex-1 w-full bg-zinc-50 font-sans dark:bg-black">
+      {/* Padding dinamis: p-4 di mobile, p-6 di tablet, p-8 di laptop */}
+      <main className="min-h-screen w-full p-4 sm:p-6 lg:p-8 bg-background dark:bg-gradient-to-br dark:from-background dark:via-background dark:to-primary/5">
+        
+        {/* Container utama dengan max-width agar tidak melebar tak terbatas di monitor ultra-wide */}
+        <div className="mx-auto max-w-7xl space-y-6 lg:space-y-8">
+          
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Overview Dashboard</h1>
-            <p className="text-foreground/60">Welcome back! Here&apos;s your business metrics.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Overview Dashboard</h1>
+            <p className="text-sm sm:text-base text-foreground/60">Welcome back! Here&apos;s your business metrics.</p>
           </div>
 
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {summaryData.map((stat:any) => (
+          {/* Stat Cards: 1 kolom di HP, 2 di tablet, 4 di laptop */}
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+            {summaryData.map((stat: any) => (
               <StatCard key={stat.title} stat={stat} />
             ))}
           </div>
 
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+          {/* Charts: 1 kolom di HP/Tablet, 2 kolom di Desktop */}
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
               <CardHeader>
-                <CardTitle>Product count grouped by Category </CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Product count by Category</CardTitle>
                 <CardDescription>Orders grouped by Status</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={productCategoryData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                    <XAxis dataKey="name" stroke="#a0aec0" />
-                    <YAxis  stroke="#a0aec0" />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
-                      labelStyle={{ color: '#e2e8f0' }}
-                    />
-                    <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                {/* Menggunakan min-height agar chart tidak terlalu gepeng di mobile */}
+                <div className="h-[250px] sm:h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={productCategoryData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                      {/* Hide text on very small screens if it overlaps, or keep it responsive */}
+                      <XAxis dataKey="name" stroke="#a0aec0" fontSize={12} tickMargin={8} />
+                      <YAxis stroke="#a0aec0" fontSize={12} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                        labelStyle={{ color: '#e2e8f0' }}
+                      />
+                      <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} maxBarSize={50} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
               <CardHeader>
-                <CardTitle>Orders grouped by Status</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Orders grouped by Status</CardTitle>
                 <CardDescription>Distribution of order statuses</CardDescription>
               </CardHeader>
               <CardContent className="flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={orderStatusData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}`}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {orderStatusData.map((entry:any, index:any) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
-                      labelStyle={{ color: '#e2e8f0' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="h-[250px] sm:h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={orderStatusData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name}: ${value}`}
+                        outerRadius={80} // Diperkecil sedikit agar tidak terpotong di mobile
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {orderStatusData.map((entry: any, index: any) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                        labelStyle={{ color: '#e2e8f0' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
-
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+
+          {/* Tables: 1 kolom di HP/Tablet, 2 kolom di Desktop */}
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>Recent Orders</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Recent Orders</CardTitle>
                 <CardDescription>Recent orders made by customers</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="w-full overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10 ">
+                {/* Scroll horizontal aman di sini */}
+                <div className="w-full overflow-x-auto pb-2 custom-scrollbar">
+                  <table className="w-full text-sm text-left min-w-[500px]">
+                    <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
                       <tr>
-                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Order ID</th>
-                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Date</th>
-                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Status</th>
-                        <th scope="col" className="px-6 py-4 text-right whitespace-nowrap">Amount</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Order ID</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Date</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Status</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">Amount</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-primary/10 text-foreground/80">
-                      {orderLatestData.map((order:any) => (
+                      {orderLatestData.map((order: any) => (
                         <tr key={order.id} className="hover:bg-primary/5 transition-colors">
-                          <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">
-                            {order.id}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">{order.date}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{order.id}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{order.date}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                             <span className={`px-2.5 py-1 rounded-full text-xs font-medium 
-                    ${order.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                              ${order.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
                                 order.status === 'Shipped' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
                                   'bg-red-500/10 text-red-500 border border-red-500/20'}`}
                             >
                               {order.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-right font-medium whitespace-nowrap">
-                            {order.amount}
-                          </td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 text-right font-medium whitespace-nowrap">{order.amount}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -193,35 +190,31 @@ export default function Home() {
 
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>Top Products</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Top Products</CardTitle>
                 <CardDescription>Most popular products based on price</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="w-full overflow-x-auto">
-
-                  <table className="w-full text-sm text-left">
+                <div className="w-full overflow-x-auto pb-2 custom-scrollbar">
+                  <table className="w-full text-sm text-left min-w-[600px]">
                     <thead className="bg-primary/5 text-foreground/80 font-medium border-b border-primary/10">
                       <tr>
-                        {/* whitespace-nowrap mencegah teks patah ke bawah di layar kecil */}
-                        <th scope="col" className="px-6 py-4 whitespace-nowrap">ID</th>
-                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Name</th>
-                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Brand</th>
-                        <th scope="col" className="px-6 py-4 whitespace-nowrap">Rating</th>
-                        <th scope="col" className="px-6 py-4 text-right whitespace-nowrap">Price</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">ID</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Name</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Brand</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">Rating</th>
+                        <th scope="col" className="px-4 py-3 sm:px-6 sm:py-4 text-right whitespace-nowrap">Price</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-primary/10 text-foreground/80">
-                      {productTopData.map((product:any) => (
+                      {productTopData.map((product: any) => (
                         <tr key={product.product_external_id} className="hover:bg-primary/5 transition-colors">
-                          <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">
-                            {product.product_external_id}
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 font-medium text-foreground whitespace-nowrap">{product.product_external_id}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.name}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{product.brand}</td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap flex items-center gap-1">
+                            {product.rating} <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">{product.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{product.brand}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{product.rating}</td>
-                          <td className="px-6 py-4 text-right font-medium whitespace-nowrap">
-                            {product.price}
-                          </td>
+                          <td className="px-4 py-3 sm:px-6 sm:py-4 text-right font-medium whitespace-nowrap">{product.price}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -231,38 +224,43 @@ export default function Home() {
             </Card>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+          {/* Rating Chart: Dibuat berdiri sendiri atau siap untuk ditemani widget lain */}
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
               <CardHeader>
-                <CardTitle>Product Range Rating</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Product Range Rating</CardTitle>
                 <CardDescription>Distribution of product ratings</CardDescription>
               </CardHeader>
               <CardContent className="flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={productRatingData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}`}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {productRatingData.map((entry:any, index:any) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
-                      labelStyle={{ color: '#e2e8f0' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="h-[250px] sm:h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={productRatingData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name}: ${value}`}
+                        outerRadius={80} // Diperkecil sedikit untuk mobile
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {productRatingData.map((entry: any, index: any) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                        labelStyle={{ color: '#e2e8f0' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
-        </div>
+            {/* Tempat kosong ini bisa digunakan untuk widget selanjutnya */}
+          </div>
+
         </div>
       </main>
     </div>
