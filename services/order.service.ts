@@ -88,8 +88,31 @@ async function getRecentOrders() {
   return formattedRecentOrders
 }
 
+async function getRevenueData() {
+  let revenueData = []
+  const now = new Date();
+
+  for (let i = 1; i <= 7; i++) {
+    const gte = new Date(now);
+    const lte = new Date(now);
+
+    gte.setHours(now.getHours() - i);
+    lte.setHours(now.getHours() - (i - 1));
+
+    const data = {
+      "hour": i + "h",
+      "revenue": await orderRepo.getRevenueData(gte, lte)
+    }
+    revenueData.push(data)
+  }
+
+  return revenueData.reverse(); 
+}
+
+
 export const orderService = {
     saveOrdersToDatabase,
     getOrderStatus,
-    getRecentOrders
+    getRecentOrders,
+    getRevenueData,
 }

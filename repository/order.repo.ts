@@ -77,6 +77,22 @@ async function getSoldProductOnOrderItems(data: number) {
     return result[0]?._sum.quantity ?? 0
 }
 
+
+async function getRevenueData(gte:any,lte:any) {
+    const result = await db.order.aggregate({
+      _sum: {
+        total_price: true, 
+      },
+      where: {
+        created_at: { 
+          gte: gte, 
+          lte: lte, 
+        },
+      },
+    });
+    return result._sum.total_price || 0;
+}
+
 export const orderRepo = {
     upsertOrder,
     groupOrdersByStatus,
@@ -84,4 +100,5 @@ export const orderRepo = {
     totalOrder,
     getTotalRevenue,
     getSoldProductOnOrderItems,
+    getRevenueData,
 }

@@ -106,7 +106,7 @@ async function getRatingRange() {
 
   const formattedRatings = Object.keys(tmp).map((key) => ({
     name: key,
-    value: tmp[key as keyof typeof tmp]
+    count: tmp[key as keyof typeof tmp]
   }));
 
   return formattedRatings;

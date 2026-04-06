@@ -3,7 +3,9 @@
 import useSWR from 'swr';
 import { TrendingUp, TrendingDown, ShoppingCart, Star, DollarSign, BarChart3 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/component/Card'
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,AreaChart,Area } from 'recharts'
+
+
 
 const COLORS = ['#a78bfa', '#3b82f6', '#10b981', '#f59e0b', '#ef4444']
 
@@ -13,6 +15,16 @@ const iconMap: Record<string, React.ElementType> = {
   BarChart3: BarChart3,
   Star: Star,
 };
+
+const revenueData = [
+  { month: '7h ago', revenue: 4000 },
+  { month: '6h ago', revenue: 3000 },
+  { month: '5h ago', revenue: 2000 },
+  { month: '4h ago', revenue: 2780 },
+  { month: '3h ago', revenue: 1890 },
+  { month: '2h ago', revenue: 2390 },
+  { month: '1h ago', revenue: 3490 },
+]
 
 function StatCard({ stat }: { stat: any }) {
   const Icon = iconMap[stat.icon]
@@ -55,8 +67,10 @@ export default function Home() {
   const { data: productTopData, isLoading: isTopLoading } = useSWR('/api/product/top/price', fetcher);
   const { data: productRatingData, isLoading: isRatingLoading } = useSWR('/api/product/rating', fetcher);
   const { data: productTopRevenue, isLoading: isTopRevenueLoading } = useSWR('/api/product/top/revenue', fetcher);
+  const { data: order7hRevenue, isLoading: isOrder7hRevenueLoading } = useSWR('/api/order/revenue', fetcher);
 
-  if (isStatusLoading || isSummaryLoading || isLatestLoading || isCategoryLoading || isTopLoading || isRatingLoading || isTopRevenueLoading) {
+
+  if (isStatusLoading || isSummaryLoading || isLatestLoading || isCategoryLoading || isTopLoading || isRatingLoading || isTopRevenueLoading || isOrder7hRevenueLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black px-4">
         <div className="text-primary animate-pulse font-semibold text-center">
@@ -89,8 +103,8 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Charts: 1 kolom di HP/Tablet, 2 kolom di Desktop */}
           <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+            {/* Product count by Category */}
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl">Product count by Category</CardTitle>
@@ -116,6 +130,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
+            {/* order by status */}
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl">Orders grouped by Status</CardTitle>
@@ -150,7 +165,7 @@ export default function Home() {
             </Card>
           </div>
 
-          {/* Tables: 1 kolom di HP/Tablet, 2 kolom di Desktop */}
+            {/* recent order */}
           <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
@@ -192,6 +207,8 @@ export default function Home() {
               </CardContent>
             </Card>
 
+
+            {/* product top price */}
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl">Top Products by Price</CardTitle>
@@ -228,8 +245,9 @@ export default function Home() {
             </Card>
           </div>
 
-          {/* Rating Chart: Dibuat berdiri sendiri atau siap untuk ditemani widget lain */}
           <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+                      {/* product top revenue */}
+
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl">Top Products by Revenue</CardTitle>
@@ -263,42 +281,61 @@ export default function Home() {
               </CardContent>
             </Card>
 
-
+            {/* product rating */}
             <Card className="border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">Product Range Rating</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Product Rating</CardTitle>
                 <CardDescription>Distribution of product ratings</CardDescription>
               </CardHeader>
               <CardContent className="flex items-center justify-center">
-                <div className="h-[250px] sm:h-[300px] w-full">
+                 <div className="h-[250px] sm:h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={productRatingData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, value }) => `${name}: ${value}`}
-                        outerRadius={80} // Diperkecil sedikit untuk mobile
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {productRatingData.map((entry: any, index: any) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
+                    <BarChart data={productRatingData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                      {/* Hide text on very small screens if it overlaps, or keep it responsive */}
+                      <XAxis dataKey="name" stroke="#a0aec0" fontSize={12} tickMargin={8} />
+                      <YAxis stroke="#a0aec0" fontSize={12} />
                       <Tooltip
                         contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
                         labelStyle={{ color: '#e2e8f0' }}
                       />
-                    </PieChart>
+                      <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} maxBarSize={50} />
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
             {/* Tempat kosong ini bisa digunakan untuk widget selanjutnya */}
           </div>
-
+          
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+            <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle>Revenue Trend</CardTitle>
+              <CardDescription>Revenue in the last 7 hours. Each unit (1h) represents one hour back and format revenue is in USD</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={order7hRevenue}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#a78bfa" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                  <XAxis dataKey="hour" stroke="#a0aec0" />
+                  <YAxis stroke="#a0aec0" />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #3b82f6', borderRadius: '8px' }}
+                    labelStyle={{ color: '#e2e8f0' }}
+                  />
+                  <Area type="monotone" dataKey="revenue" stroke="#a78bfa" fillOpacity={1} fill="url(#colorRevenue)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+          </div>
         </div>
       </main>
     </div>
